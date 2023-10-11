@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Memory Game">
+    <title>Memory Game</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            width: 15vw;
+            height: 15vw;
+            max-width: 100px;
+            max-height: 100px;
+            background-color: #4caf50;
+            margin: 2vw;
+            text-align: center;
+            font-size: 5vw;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            color: #fff;
+            position: relative;
+        }
+
+        .card .card-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .card.flipped .card-content {
+            opacity: 1;
+        }
+
+        .card.flipped {
+            background-color: #fff;
+            color: #000;
+            pointer-events: none;
+        }
+
+        #game-board {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            max-width: 600px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-board"></div>
+
+    <script>
+        const cardsArray = ['A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E', 'F', 'F'];
+        let cardsChosen = [];
+        let cardsChosenId = [];
+        let cardsWon = [];
+
+        function createBoard() {
+            const gameBoard = document.getElementById('game-board');
+            cardsArray.sort(() => 0.5 - Math.random());
+
+            for (let i = 0; i < cardsArray.length; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.setAttribute('data-id', i);
+
+                const cardContent = document.createElement('div');
+                cardContent.className = 'card-content';
+                cardContent.textContent = cardsArray[i];
+                card.appendChild(cardContent);
+
+                card.addEventListener('click', flipCard);
+                gameBoard.appendChild(card);
+            }
+        }
+
+        function checkForMatch() {
+            const cards = document.querySelectorAll('.card');
+            const [id1, id2] = cardsChosenId;
+
+            if (cardsChosen[0] === cardsChosen[1] && id1 !== id2) {
+                alert('Par encontrado!');
+                cards[id1].classList.add('flipped');
+                cards[id2].classList.add('flipped');
+                cards[id1].style.pointerEvents = 'none';
+                cards[id2].style.pointerEvents = 'none';
+                cardsWon.push(cardsChosen);
+            } else {
+                setTimeout(() => {
+                    cards[id1].classList.remove('flipped');
+                    cards[id2].classList.remove('flipped');
+                }, 1000);
+                alert('Tente novamente.');
+            }
+
+            cardsChosen = [];
+            cardsChosenId = [];
+
+            if (cardsWon.length === cardsArray.length / 2) {
+                alert('Parabéns! Você encontrou todos os pares!');
+            }
+        }
+
+        function flipCard() {
+            const cardId = this.getAttribute('data-id');
+            cardsChosen.push(cardsArray[cardId]);
+            cardsChosenId.push(cardId);
+            this.classList.add('flipped');
+
+            if (cardsChosen.length === 2) {
+                setTimeout(checkForMatch, 500);
+            }
+        }
+
+        createBoard();
+    </script>
+</body>
+
+</html>
